@@ -1,0 +1,44 @@
+<div cg-busy="{promise:loadingLayer,minDuration:500}" class="terminal-full-screen" layout="column">
+    <div class="terminal-head white" layout="row">
+        <div flex="70" layout="row">
+            <div ng-if="shell ==='exec'" layout="row">
+                <div>
+                    <label>容器</label>
+                </div>
+                <select class="terminal-select" ng-change="containerChange(this)" ng-model="containerName">
+                    <option ng-repeat="container in containerList" ng-value="container">{{container}}</option>
+                </select>
+                <select class="terminal-select" ng-change="commandChange(this)" ng-model="commandName">
+                    <option ng-repeat="command in commandList" ng-value="command">{{command}}</option>
+                </select>
+            </div>
+            <div ng-if="shell ==='log'" layout="row">
+                <div>
+                    <label>容器</label>
+                </div>
+                <select class="terminal-select" ng-change="containerChange(this)" ng-model="containerName">
+                    <option ng-repeat="container in containerList" ng-value="container">{{container}}</option>
+                </select>
+                <div>
+                    <label>行数</label>
+                </div>
+                <select class="terminal-select" ng-change="logRowChange(this)" ng-model="tailLines">
+                    <option ng-repeat="logRow in logRowList" ng-value="logRow">{{logRow}}</option>
+                </select>
+                <div>
+                    <label>跟随</label>
+                </div>
+                <div class="scroll-padding-left">
+                    <md-switch ng-click="changeActive()" class="follow-single-select md-primary"
+                               aria-label="enable" ng-model="log.follow">
+                    </md-switch>
+                </div>
+            </div>
+        </div>
+        <div flex="30">
+            <div ng-if="podDetail">POD:&nbsp;&nbsp;{{podDetail.metadata.namespace}}/{{podDetail.metadata.name}}/{{containerName}}</div>
+        </div>
+    </div>
+    <div id="terminal" class="terminal-wrapper height-93">
+    </div>
+</div>
