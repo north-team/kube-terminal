@@ -2,9 +2,9 @@ package routers
 
 import (
 	"github.com/astaxie/beego"
-	"kube-terminal/k8s-webshell/client/logging"
-	"kube-terminal/k8s-webshell/client/terminal"
-	"kube-terminal/k8s-webshell/controllers"
+	"kube-terminal/client/logging"
+	"kube-terminal/client/terminal"
+	"kube-terminal/controllers"
 )
 
 func init() {

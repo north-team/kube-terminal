@@ -4,10 +4,10 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/remotecommand"
-	"kube-terminal/k8s-webshell/client"
-	"kube-terminal/k8s-webshell/client/logging"
-	"kube-terminal/k8s-webshell/client/terminal"
-	"kube-terminal/k8s-webshell/model/request"
+	"kube-terminal/client"
+	"kube-terminal/client/logging"
+	"kube-terminal/client/terminal"
+	"kube-terminal/model/request"
 )
 
 type SessionController struct {

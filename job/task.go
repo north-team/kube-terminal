@@ -1,8 +1,7 @@
 package job
 
 import (
-	"github.com/robfig/cron/v3"
-	"kube-terminal/k8s-webshell/client"
+	"kube-terminal/client"
 )
 
 var TaskCron *cron.Cron

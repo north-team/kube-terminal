@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"kube-terminal/k8s-webshell/model/request"
+	"kube-terminal/model/request"
 	"log"
 	"net/http"
 	"sync"

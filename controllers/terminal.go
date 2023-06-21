@@ -6,10 +6,10 @@ import (
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"kube-terminal/k8s-webshell/client"
-	"kube-terminal/k8s-webshell/client/logging"
-	"kube-terminal/k8s-webshell/client/terminal"
-	"kube-terminal/k8s-webshell/model/request"
+	"kube-terminal/client"
+	"kube-terminal/client/logging"
+	"kube-terminal/client/terminal"
+	"kube-terminal/model/request"
 	"reflect"
 )
 
