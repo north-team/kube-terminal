@@ -1,9 +1,9 @@
 #!/bin/bash
 mkdir bin
 echo "start package"
-GOOS=linux go build -o bin/k8s-webshell
-#GOOS=darwin go build -o bin/k8s-webshell-mac
-#GOOS=windows go build -o bin/k8s-webshell.exe
+GOOS=linux go build -o bin/kube-terminal
+#GOOS=darwin go build -o bin/kube-terminal-mac
+#GOOS=windows go build -o bin/kube-terminal.exe
 
 # Copy
 echo "start copy"
@@ -17,8 +17,8 @@ cp Dockerfile bin/
 echo "start build"
 cd bin/
 pwd
-docker build -t registry.fit2cloud.com/north/k8s-webshell:master .
-docker push registry.fit2cloud.com/north/k8s-webshell:master
+docker build -t registry.fit2cloud.com/north/kube-terminal:dev .
+#docker push registry.fit2cloud.com/north/k8s-webshell:master
 
 # Delete
 cd ..

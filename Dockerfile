@@ -1,14 +1,16 @@
-FROM alpine:latest
+FROM kubeoperator/webkubectl
 
 LABEL maintainer="kube terminal by makai"
 
 RUN apk add -U tzdata && \
-    ln -sf /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime
+    ln -sf /usr/share/zoneinfo/Asia/Shanghai  /etc/localtime && \
+    mkdir /opt/kube
 
-COPY k8s-webshell /opt/kube/k8s-webshell
+COPY kube-terminal /opt/kube/kube-terminal
 COPY conf /opt/kube/conf
 COPY static /opt/kube/static
 COPY views /opt/kube/views
+COPY start.sh /opt/kube/
 
 WORKDIR /opt/kube
-CMD ./k8s-webshell
+CMD ["sh","/opt/kube/start.sh"]
