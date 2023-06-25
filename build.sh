@@ -19,7 +19,7 @@ echo "start build"
 cd bin/
 pwd
 docker build -t registry.fit2cloud.com/north/kube-terminal:dev .
-#docker push registry.fit2cloud.com/north/k8s-webshell:master
+docker push registry.fit2cloud.com/north/kube-terminal:dev
 
 # Delete
 cd ..
