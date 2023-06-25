@@ -11,6 +11,7 @@ pwd
 cp -rf conf bin/
 cp -rf static bin/
 cp -rf views bin/
+cp start.sh bin/
 cp Dockerfile bin/
 
 # Build
