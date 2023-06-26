@@ -1,4 +1,4 @@
-FROM kubeoperator/webkubectl
+FROM alpine:latest
 
 LABEL maintainer="kube terminal by makai"
 
@@ -13,4 +13,4 @@ COPY views /opt/kube/views
 COPY start.sh /opt/kube/
 
 WORKDIR /opt/kube
-CMD ["sh","/opt/kube/start.sh"]
+CMD ./kube-terminal
