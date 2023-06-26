@@ -10,7 +10,6 @@ COPY kube-terminal /opt/kube/kube-terminal
 COPY conf /opt/kube/conf
 COPY static /opt/kube/static
 COPY views /opt/kube/views
-COPY start.sh /opt/kube/
 
 WORKDIR /opt/kube
 CMD ./kube-terminal
