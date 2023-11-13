@@ -39,7 +39,7 @@ TerminalApp.directive("bashTerminal", function (Notification, HttpUtils, Transla
 
             $scope.initCommand = function (){
                 if($scope.shell === 'exec'){
-                    $scope.commandName = "bash";
+                    $scope.commandName = "sh";
                     $scope.commandList = ["bash","sh"];
                 }else{
                     $scope.log = {
