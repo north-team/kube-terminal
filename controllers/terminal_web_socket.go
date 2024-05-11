@@ -10,7 +10,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
 	_ "k8s.io/client-go/tools/clientcmd/api"
 	"k8s.io/client-go/tools/remotecommand"
 	"kube-terminal/client"
@@ -71,15 +70,6 @@ func restClientByToken(env *TerminalSockjs) (*rest.Config, error) {
 			Insecure: true, // 设置为true时 不需要CA
 		},
 	}, nil
-}
-
-// kubeConfig方式认证
-func buildConfigFromContextFlags(context, kubeConfigPath string) (*rest.Config, error) {
-	return clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		&clientcmd.ClientConfigLoadingRules{ExplicitPath: kubeConfigPath},
-		&clientcmd.ConfigOverrides{
-			CurrentContext: context,
-		}).ClientConfig()
 }
 
 // Handler 处理输入输出与sockjs 交互

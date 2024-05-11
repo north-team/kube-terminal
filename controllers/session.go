@@ -3,6 +3,7 @@ package controllers
 import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/remotecommand"
 	"kube-terminal/client"
 	"kube-terminal/client/logging"
@@ -18,15 +19,32 @@ type TerminalResponse struct {
 	ID string `json:"id"`
 }
 
+// kubeConfig方式认证
+func buildConfigFromContextFlags(context, kubeConfigPath string) (*rest.Config, error) {
+	return clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+		&clientcmd.ClientConfigLoadingRules{ExplicitPath: kubeConfigPath},
+		&clientcmd.ConfigOverrides{
+			CurrentContext: context,
+		}).ClientConfig()
+}
+
 func (this SessionController) GetSession() {
 	apiServer := this.GetString("apiServer")
 	k8sToken := this.GetString("k8sToken")
+	kubeConfig := this.GetString("kubeConfig")
 	namespace := this.GetString("namespace")
 	podName := this.GetString("pod")
 	shell := this.Ctx.Input.Param(":shell")
 
 	//验证apiServer 和 k8sToken 是否有效
 	config, err := client.RestConfigByToken(apiServer, k8sToken)
+	// 如果kubeConfig不为空 则获取kubeConfig配置
+	if kubeConfig != "" {
+		config, err = buildConfigFromContextFlags(kubeConfig, "")
+		if err != nil {
+			this.ErrorJson(500, "无法通过 K8S Token 获取有效配置，请检查Token是否正确", err)
+		}
+	}
 	if err != nil {
 		this.ErrorJson(500, "无法通过 K8S Token 获取有效配置，请检查Token是否正确", err)
 	}
