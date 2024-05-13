@@ -19,15 +19,6 @@ type TerminalResponse struct {
 	ID string `json:"id"`
 }
 
-// kubeConfig方式认证
-func buildConfigFromContextFlags(context, kubeConfigPath string) (*rest.Config, error) {
-	return clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		&clientcmd.ClientConfigLoadingRules{ExplicitPath: kubeConfigPath},
-		&clientcmd.ConfigOverrides{
-			CurrentContext: context,
-		}).ClientConfig()
-}
-
 func (this SessionController) GetSession() {
 	apiServer := this.GetString("apiServer")
 	k8sToken := this.GetString("k8sToken")
@@ -36,17 +27,28 @@ func (this SessionController) GetSession() {
 	podName := this.GetString("pod")
 	shell := this.Ctx.Input.Param(":shell")
 
-	//验证apiServer 和 k8sToken 是否有效
-	config, err := client.RestConfigByToken(apiServer, k8sToken)
-	// 如果kubeConfig不为空 则获取kubeConfig配置
+	var config *rest.Config
 	if kubeConfig != "" {
-		config, err = buildConfigFromContextFlags(kubeConfig, "")
+		// 将kubeconfig字符串内容转换为字节切片
+		kubeConfigBytes := []byte(kubeConfig)
+		// 使用NewClientConfigFromBytes从kubeconfig字节内容创建ClientConfig实例
+		configLoader, err := clientcmd.NewClientConfigFromBytes(kubeConfigBytes)
+		if err != nil {
+			this.ErrorJson(500, "无法通过 K8S KubeConfig 获取configLoader，请检查KubeConfig是否正确", err)
+		}
+		// 加载实际的rest.Config
+		restConfig, err := configLoader.ClientConfig()
+		if err != nil {
+			this.ErrorJson(500, "无法通过 K8S KubeConfig 获取有效配置，请检查KubeConfig是否正确", err)
+		}
+		config = restConfig
+	} else {
+		//验证apiServer 和 k8sToken 是否有效
+		restConfig, err := client.RestConfigByToken(apiServer, k8sToken)
 		if err != nil {
 			this.ErrorJson(500, "无法通过 K8S Token 获取有效配置，请检查Token是否正确", err)
 		}
-	}
-	if err != nil {
-		this.ErrorJson(500, "无法通过 K8S Token 获取有效配置，请检查Token是否正确", err)
+		config = restConfig
 	}
 	restClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
