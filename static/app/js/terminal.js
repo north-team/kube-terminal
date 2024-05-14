@@ -11,7 +11,7 @@ TerminalApp.controller("BaseTerminalController", function ($scope,HttpUtils) {
 TerminalApp.directive("bashTerminal", function (Notification, HttpUtils, Translator, $timeout, $window) {
     return {
         restrict: 'A',
-        templateUrl: '/static/app/html/pod-terminal.html' + '?_t=' + Math.random(),
+        templateUrl: '/kube-terminal/static/app/html/pod-terminal.html' + '?_t=' + Math.random(),
         scope: {
             shell: "=",
             sessionId: "=",
@@ -54,9 +54,9 @@ TerminalApp.directive("bashTerminal", function (Notification, HttpUtils, Transla
 
                 let url = window.location.origin
                 if($scope.shell === 'exec'){
-                    url += "/terminal/sockjs?sessionId=" + $scope.sessionId + "&container=" + $scope.containerName + "&cmd=" + $scope.commandName;
+                    url += "/kube-terminal/terminal/sockjs?sessionId=" + $scope.sessionId + "&container=" + $scope.containerName + "&cmd=" + $scope.commandName;
                 } else {
-                    url += "/logging/sockjs?sessionId=" + $scope.sessionId + "&container=" + $scope.containerName + "&follow=" + $scope.log.follow + "&tailLines=" + $scope.tailLines;
+                    url += "/kube-terminal/logging/sockjs?sessionId=" + $scope.sessionId + "&container=" + $scope.containerName + "&follow=" + $scope.log.follow + "&tailLines=" + $scope.tailLines;
                 }
                 $scope.socket = new SockJS(url);
                 $scope.socketFunc();

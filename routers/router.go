@@ -8,18 +8,16 @@ import (
 )
 
 func init() {
-	beego.Router("/", &controllers.HomeController{})
-	beego.Router("/terminal", &controllers.TerminalController{}, "get:Get")
 
-	beego.Router("/terminal/pod", &controllers.TerminalController{}, "get:Terminal")
-
-	beego.Router("/pod/terminal/:sessionId/:shell", &controllers.TerminalController{}, "get:TerminalView")
-
-	beego.Router("/terminal/token", &controllers.TokenController{}, "post:Token")
-	//POST 传递apiServer、k8sToken、shell 等信息，获取对应 session
-	beego.Router("/session/get/:shell", &controllers.SessionController{}, "post:GetSession")
-
-	beego.Handler("/terminal/ws", &controllers.TerminalSockjs{}, true)
-	beego.Handler("/logging/sockjs/", logging.LogSession{}, true)
-	beego.Handler("/terminal/sockjs/", terminal.TerminalSession{}, true)
+	ns := beego.NewNamespace("kube-terminal",
+		beego.NSRouter("/", &controllers.HomeController{}),
+		beego.NSRouter("/terminal", &controllers.TerminalController{}, "get:Get"),
+		beego.NSRouter("/terminal/pod", &controllers.TerminalController{}, "get:Terminal"),
+		beego.NSRouter("/pod/terminal/:sessionId/:shell", &controllers.TerminalController{}, "get:TerminalView"),
+		beego.NSRouter("/terminal/token", &controllers.TokenController{}, "post:Token"),
+		beego.NSRouter("/session/get/:shell", &controllers.SessionController{}, "post:GetSession"))
+	beego.AddNamespace(ns)
+	beego.Handler("/kube-terminal/terminal/ws", &controllers.TerminalSockjs{}, true)
+	beego.Handler("/kube-terminal/logging/sockjs/", logging.LogSession{}, true)
+	beego.Handler("/kube-terminal/terminal/sockjs/", terminal.TerminalSession{}, true)
 }

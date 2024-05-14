@@ -26,11 +26,11 @@
             color: #00ff00;
         }
     </style>
-    <script src="../static/js/jquery.min.js"></script>
-    <script src="../static/js/bootstrap.min.js"></script>
-    <script src="../static/js/xterm.js"></script>
-    <script src="../static/js/xterm-addon-fit.js"></script>
-    <script src="../static/js/sockjs-1.6.1.js"></script>
+    <script src="../kube-terminal/static/js/jquery.min.js"></script>
+    <script src="../kube-terminal/static/js/bootstrap.min.js"></script>
+    <script src="../kube-terminal/static/js/xterm.js"></script>
+    <script src="../kube-terminal/static/js/xterm-addon-fit.js"></script>
+    <script src="../kube-terminal/static/js/sockjs-1.6.1.js"></script>
 </head>
 <body style="border-width: 0px;margin:0px">
 
@@ -100,7 +100,7 @@
         let container = document.getElementById('terminal-container');
         // 生成参数
         let localUrl=window.location.href.split('/')[2]
-        let url = 'http://' + localUrl + '/terminal/ws?context={{.context}}&namespace={{.namespace}}&pod={{.pod}}&container={{.container}}&token={{.token}}&rows=' + rows + '&cols=' + cols;
+        let url = localUrl + '/kube-terminal/terminal/ws?context={{.context}}&namespace={{.namespace}}&pod={{.pod}}&container={{.container}}&token={{.token}}&rows=' + rows + '&cols=' + cols;
         console.log(url)
         // 生成socket对象
         let socket = new SockJS(url);

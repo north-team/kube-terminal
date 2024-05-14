@@ -6,5 +6,6 @@ import (
 )
 
 func main() {
+	beego.SetStaticPath("/kube-terminal/static", "static")
 	beego.Run()
 }
