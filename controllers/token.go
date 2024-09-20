@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"kube-terminal/client"
@@ -33,15 +34,18 @@ func (self *TokenController) Token() {
 	//验证apiServer 和 k8sToken 是否有效
 	config, err := client.RestConfigByToken(apiServer, k8sToken)
 	if err != nil {
-		self.ErrorJson(500, "获取k8s客户端失败", err)
+		fmt.Println(err)
+		self.ErrorJson(500, "获取k8s客户端失败", nil)
 	}
 	restClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		self.ErrorJson(500, "获取k8s客户端失败", err)
+		fmt.Println(err)
+		self.ErrorJson(500, "获取k8s客户端失败", nil)
 	}
 	_, err = restClient.CoreV1().Namespaces().List(context.Background(), metav1.ListOptions{})
 	if err != nil {
-		self.ErrorJson(500, "K8S账户校验失败", err)
+		fmt.Println(err)
+		self.ErrorJson(500, "K8S账户校验失败", nil)
 	}
 	client.TokenCache[token] = client.TokenEntity{
 		ApiServer: apiServer,

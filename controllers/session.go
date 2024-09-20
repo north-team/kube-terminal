@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -34,25 +35,29 @@ func (this SessionController) GetSession() {
 		// 使用NewClientConfigFromBytes从kubeconfig字节内容创建ClientConfig实例
 		configLoader, err := clientcmd.NewClientConfigFromBytes(kubeConfigBytes)
 		if err != nil {
-			this.ErrorJson(500, "无法通过 K8S KubeConfig 获取configLoader，请检查KubeConfig是否正确", err)
+			fmt.Println(err)
+			this.ErrorJson(500, "无法通过 K8S KubeConfig 获取configLoader，请检查KubeConfig是否正确", nil)
 		}
 		// 加载实际的rest.Config
 		restConfig, err := configLoader.ClientConfig()
 		if err != nil {
-			this.ErrorJson(500, "无法通过 K8S KubeConfig 获取有效配置，请检查KubeConfig是否正确", err)
+			fmt.Println(err)
+			this.ErrorJson(500, "无法通过 K8S KubeConfig 获取有效配置，请检查KubeConfig是否正确", nil)
 		}
 		config = restConfig
 	} else {
 		//验证apiServer 和 k8sToken 是否有效
 		restConfig, err := client.RestConfigByToken(apiServer, k8sToken)
 		if err != nil {
-			this.ErrorJson(500, "无法通过 K8S Token 获取有效配置，请检查Token是否正确", err)
+			fmt.Println(err)
+			this.ErrorJson(500, "无法通过 K8S Token 获取有效配置，请检查Token是否正确", nil)
 		}
 		config = restConfig
 	}
 	restClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		this.ErrorJson(500, "无法通过 K8S Token 获取有效配置，请检查Token是否正确", err)
+		fmt.Println(err)
+		this.ErrorJson(500, "无法通过 K8S Token 获取有效配置，请检查Token是否正确", nil)
 	}
 	this.chooseSession(shell, apiServer, namespace, podName, restClient, config)
 
@@ -65,7 +70,8 @@ func (this SessionController) chooseSession(shell string, apiServer string, name
 	if shell == "log" {
 		sessionId, err := logging.GenLoggingSessionId()
 		if err != nil {
-			this.ErrorJson(500, "获取 TerminalSession 失败", err)
+			fmt.Println(err)
+			this.ErrorJson(500, "获取 TerminalSession 失败", nil)
 		}
 		logging.LogSessions.Set(sessionId, logging.LogSession{
 			Id:    sessionId,
@@ -83,7 +89,8 @@ func (this SessionController) chooseSession(shell string, apiServer string, name
 		shell = "exec"
 		sessionId, err := terminal.GenTerminalSessionId()
 		if err != nil {
-			this.ErrorJson(500, "获取 TerminalSession 失败", err)
+			fmt.Println(err)
+			this.ErrorJson(500, "获取 TerminalSession 失败", nil)
 		}
 		terminal.TerminalSessions.Set(sessionId, terminal.TerminalSession{
 			Id:       sessionId,
