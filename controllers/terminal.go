@@ -74,9 +74,9 @@ func (self *TerminalController) TerminalView() {
 
 	self.Data["shell"] = shell
 	self.Data["sessionId"] = sessionId
-	podDetail, err := client.GetContainer(info.K8sClient, info.Namespace, info.PodName)
+	podDetail, err := client.GetContainer(info.GetK8sClient(), info.Namespace, info.PodName)
 	if err != nil {
-		self.ErrorJson(500, "无法获取POD中的容器，连接失败！", nil)
+		self.ErrorJson(500, "无法获取POD中的容器，连接失败！"+err.Error(), nil)
 	}
 	self.Data["podDetail"] = podDetail
 	self.TplName = "pod-terminal.html"

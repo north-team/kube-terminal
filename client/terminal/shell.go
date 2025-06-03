@@ -33,10 +33,10 @@ type PtyHandler interface {
 // TerminalSession implements PtyHandler (using a SockJS connection)
 type TerminalSession struct {
 	Id            string
-	Bound         chan error
+	Bound         chan error `json:"-"` // 忽略这个字段
 	sockJSSession sockjs.Session
-	SizeChan      chan remotecommand.TerminalSize
-	doneChan      chan struct{}
+	SizeChan      chan remotecommand.TerminalSize `json:"-"` // 忽略这个字段
+	doneChan      chan struct{}                   `json:"-"` // 忽略这个字段
 	TimeOut       time.Time
 	RequestInfo   request.TerminalRequest
 }
@@ -244,8 +244,8 @@ func startProcess(k8sClient kubernetes.Interface, cfg *rest.Config, cmd []string
 }
 
 func start(session TerminalSession, containerName string, cmd string) {
-	client := session.RequestInfo.K8sClient
-	cfg := session.RequestInfo.Cfg
+	client := session.RequestInfo.GetK8sClient()
+	cfg := session.RequestInfo.GetConfig()
 	namespace := session.RequestInfo.Namespace
 	pod := session.RequestInfo.PodName
 	var err error

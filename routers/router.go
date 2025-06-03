@@ -18,6 +18,6 @@ func init() {
 		beego.NSRouter("/session/get/:shell", &controllers.SessionController{}, "post:GetSession"))
 	beego.AddNamespace(ns)
 	beego.Handler("/kube-terminal/terminal/ws", &controllers.TerminalSockjs{}, true)
-	beego.Handler("/kube-terminal/logging/sockjs/", logging.LogSession{}, true)
+	beego.Handler("/kube-terminal/logging/sockjs/", &logging.LogSession{}, true)
 	beego.Handler("/kube-terminal/terminal/sockjs/", terminal.TerminalSession{}, true)
 }

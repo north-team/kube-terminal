@@ -11,7 +11,6 @@ import (
 	"math/rand"
 	"net/http"
 	"strings"
-	"sync"
 
 	"gopkg.in/igm/sockjs-go.v2/sockjs"
 	v1 "k8s.io/api/core/v1"
@@ -29,54 +28,24 @@ func GenLoggingSessionId() (string, error) {
 }
 
 type LogSession struct {
-	Id            string
-	Bound         chan error
-	sockJSSession sockjs.Session
-	RequestInfo   request.TerminalRequest
+	Id            string                  `json:"id"`
+	Bound         chan error              `json:"-"` // 忽略这个字段
+	sockJSSession sockjs.Session          `json:"-"` // 忽略这个字段
+	RequestInfo   request.TerminalRequest `json:"requestInfo"`
 }
 
-type SessionMap struct {
-	Sessions map[string]LogSession
-	Lock     sync.Mutex
-}
-
-func (sm *SessionMap) Get(sessionId string) LogSession {
-	sm.Lock.Lock()
-	defer sm.Lock.Unlock()
-	return sm.Sessions[sessionId]
-}
-
-func (sm *SessionMap) Set(sessionId string, session LogSession) {
-	sm.Lock.Lock()
-	defer sm.Lock.Unlock()
-	sm.Sessions[sessionId] = session
-}
-
-func (sm *SessionMap) Close(sessionId, reason string, status uint32) {
-	if _, ok := sm.Sessions[sessionId]; !ok {
-		return
-	}
-	sm.Lock.Lock()
-	defer sm.Lock.Unlock()
-	err := sm.Sessions[sessionId].sockJSSession.Close(status, reason)
-	if err != nil {
-		log.Println(err)
-	}
-	delete(sm.Sessions, sessionId)
-}
-
-func (sm *SessionMap) Clean() {
-	for _, v := range sm.Sessions {
-		v.sockJSSession.Close(2, "system is logout, please retry...")
-	}
-	sm.Sessions = make(map[string]LogSession)
-}
-
-var LogSessions = SessionMap{Sessions: make(map[string]LogSession)}
+var LogSessions SessionStore
 
 type LogMessage struct {
 	SessionID string
 	Data      string
+}
+
+type SessionStore interface {
+	Get(id string) *LogSession
+	Set(id string, session *LogSession)
+	Close(id string, reason string, status uint32)
+	Clean()
 }
 
 func CreateLoggingHandler(path string) http.Handler {
@@ -89,7 +58,7 @@ func logHandler(session sockjs.Session) {
 		buf        string
 		err        error
 		msg        LogMessage
-		logSession LogSession
+		logSession *LogSession
 	)
 	if buf, err = session.Recv(); err != nil {
 		log.Printf("handleLogSession: can't Recv: %v", err)
@@ -122,14 +91,14 @@ func WaitForLoggingStream(k8sClient kubernetes.Interface, namespace string, pod 
 }
 
 func WaitForTerminalBySession(session LogSession, containerName string, tailLines int64, follow bool) {
-	client := session.RequestInfo.K8sClient
+	client := session.RequestInfo.GetK8sClient()
 	namespace := session.RequestInfo.Namespace
 	pod := session.RequestInfo.PodName
 	id := session.Id
 	WaitForLoggingStream(client, namespace, pod, containerName, tailLines, follow, id)
 }
 
-func startLogProcess(k8sClient kubernetes.Interface, namespace string, pod string, container string, tailLines int64, follow bool, session LogSession) error {
+func startLogProcess(k8sClient kubernetes.Interface, namespace string, pod string, container string, tailLines int64, follow bool, session *LogSession) error {
 	fmt.Println("tailLines======", tailLines)
 	reader, err := k8sClient.CoreV1().
 		Pods(namespace).
@@ -164,8 +133,8 @@ func startLogProcess(k8sClient kubernetes.Interface, namespace string, pod strin
 	}
 }
 
-func start(session LogSession, containerName string, tailLines int64, follow bool) {
-	client := session.RequestInfo.K8sClient
+func start(session *LogSession, containerName string, tailLines int64, follow bool) {
+	client := session.RequestInfo.GetK8sClient()
 	namespace := session.RequestInfo.Namespace
 	pod := session.RequestInfo.PodName
 	err := startLogProcess(client, namespace, pod, containerName, tailLines, follow, session)
@@ -177,7 +146,7 @@ func start(session LogSession, containerName string, tailLines int64, follow boo
 	}
 }
 
-func (self LogSession) ServeHTTP(w http.ResponseWriter, request *http.Request) {
+func (self *LogSession) ServeHTTP(w http.ResponseWriter, request *http.Request) {
 	sessionId := request.FormValue("sessionId")
 	container := request.FormValue("container")
 	tailLines := request.FormValue("tailLines")
