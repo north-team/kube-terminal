@@ -26,7 +26,7 @@ func LoadConfig(path string) *RedisConfig {
 	redisPassword := p.GetString("redis.password", "")
 	var password string
 	if security {
-		encryptPassword, err := aes.Encrypt(aes.SECRET_PASS, redisPassword)
+		encryptPassword, err := aes.Decrypt(aes.SECRET_PASS, redisPassword)
 		if err != nil {
 			panic("Redis 解密密码失败: " + err.Error())
 		}
